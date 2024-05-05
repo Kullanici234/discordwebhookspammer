@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Webhook Spammer/Message Sender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            color: #000;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #000;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f3f3f3;
+            color: #000;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.spam {
+            background-color: #1E90FF;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #status {
+            font-weight: bold;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Discord Webhook Messenger</h2>
+        <form id="messageForm">
+            <label for="webhook">Webhook URL:</label>
+            <input type="text" id="webhook" name="webhook" required><br><br>
+            <label for="message">Message:</label>
+            <input type="text" id="message" name="message" required><br><br>
+            <input type="checkbox" id="spamCheckbox">
+            <label for="spamCheckbox">Spam Message</label><br><br>
+            <button type="submit">Send</button>
+        </form>
+        <p id="status"></p>
+    </div>
+    <script>
+        document.getElementById("messageForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var webhookURL = document.getElementById("webhook").value;
+            var message = document.getElementById("message").value;
+            var spamming = document.getElementById("spamCheckbox").checked;
+
+            if (spamming) {
+                startSpam(webhookURL, message);
+            } else {
+                sendMessage(webhookURL, message);
+            }
+        });
+
+        function sendMessage(webhookURL, message) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", webhookURL, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 204) {
+                        document.getElementById("status").textContent = "Message sent successfully!";
+                    } else {
+                        document.getElementById("status").textContent = "Error: " + xhr.statusText;
+                    }
+                }
+            };
+            var data = JSON.stringify({"content": message});
+            xhr.send(data);
+        }
+
+        function startSpam(webhookURL, message) {
+            var intervalId = setInterval(function() {
+                sendMessage(webhookURL, message);
+            }, 100);
+            
+            document.getElementById("spamCheckbox").addEventListener("change", function() {
+                clearInterval(intervalId);
+            });
+        }
+    </script>
+</body>
+</html>
